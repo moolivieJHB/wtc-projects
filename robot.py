@@ -1,78 +1,210 @@
-
-
-# TODO: Decompose into functions
-
-    
-def move_square(s ,d):
-    ''' this is the functon used to move the robot in the shape ofa a sqaure
-        for the degree (d) and size (s) specified in the move() function'''
-
-    print("Moving in a square of size "+str(s))
-    for i in range(4):
-            
-        print("* Move Forward "+str(s))
-        print("* Turn Right "+str(d)+" degrees")
-
-def move_rectangle(lenn , wid , deg):
-    ''' this function moves the robot in a rectangle and takes arguments for the length (lenn),
-          width(wid) and degrees(deg) ; for which it should move in a rectangle      '''
-    print("Moving in a rectangle of "+str(lenn)+" by "+str(wid))
-    for i in range(2):
-        
-        print("* Move Forward "+str(lenn))
-        print("* Turn Right "+str(deg)+" degrees")
-        print("* Move Forward "+str(wid))
-        print("* Turn Right "+str(deg)+" degrees")
-def move_circle(deg , lenn):
-    '''this function moves the robot in a circle . It has 2 arguements , lenn and degree
-       which is used to move the toy in a circle.'''
-
-    print("Moving in a circle")
-
-    for i in range(360):
-            
-        print("* Move Forward "+str(lenn))
-        print("* Turn Right "+str(deg)+" degrees")
-
-def square_dancing(lenn ,s , deg):
-    ''' this function takes length(lenn) , size (s) and degree (deg) as arguements.
-     It makes the robot dance(move) according to was in the main function (move()) as parameters'''
-    print(f"Square dancing - 3 squares of size {s}")
-    for i in range(3):
-        # length = 20
-        print("* Move Forward "+str(lenn))
-        print(f"Moving in a square of size {s}")
-        for j in range(4):
-            print("* Move Forward " + str(s))
-            print("* Turn Right " + str(deg) + " degrees")
-                #degrees = 90
-def crop_circles(size, lenn , deg):
-    ''' this function which takes length(lenn) and degrees(deg) as arguements; is used to
-        move the robot in  a crop circle'''
-    print("Crop circles - 4 circles")
-    for i in range(4):
-        print(f"* Move Forward {size}")
-        print("Moving in a circle")
-        for k in range(360):
-            print("* Move Forward " + str(lenn))
-            print("* Turn Right " + str(deg) + " degrees")
-    
-def move():
-    ''' instead of move() i would name the function move_toy_robot . I 
-    choose this name because it is very descriptive; it tells you exactly what will be moved.'''
-    ''' this function provides paramenters for each of the above functions'''
-    move_square(10,90) 
-    move_rectangle(20 ,10,90)
-    move_circle(1,1)
-    square_dancing(20 ,20,90)
-    crop_circles(20,1,1)
- 
 def robot_start():
-    '''this function calls the move function'''
-    move()
+    """This is the entry function, do not change"""
+    # global name
+    # """This is the entry function, do not change"""
+    # name= input("What do you want to name your robot?")
+    # name= name.upper()
+    # print (name)
+    # print('Hello kiddo!')
+    # return name
+    command=['OFF', 'HELP' ,'FORWARD','BACK' , 'RIGHT', 'LEFT', 'SPRINT']
+    steps=''
+    name=''
+    ycoordinate = 0
+    xcoordinate = 0
+    name = get_robot_name()
+    off = ""
+    key= 0
+    while True:
+
+        ycoordinate , xcoordinate , off  , key = get_command_input(name , command , ycoordinate , xcoordinate , off , key)
+        if off=="anything":
+
+            break
+
+def get_robot_name():
+    # global name
+
+    name = input("What do you want to name your robot? ")
+    name = name.upper()
+    print("{}: Hello kiddo!".format(name))   
+    return name
+    
+def get_command_input(name , command , ycoordinate , xcoordinate , off , key ):
+
+    plus=0
+    action2 = input("{}: What must I do next? ".format(name))
+    
+    action= action2.upper()
+    
+    action=action.split()
+    
+    if action[0] in command:
+        if action[0]=='OFF':
+            print("{}: Shutting down..".format(name))
+            off="anything"
+           
+        elif action[0]=='HELP':
+            help()
+        
+        elif action[0] =='RIGHT':
+            key+=1
+            if key==4:
+                key =0
+            turn_right(name , ycoordinate , xcoordinate)
+        elif action[0]=='LEFT':
+            key-=1
+            if key<0:
+                key = 3
+            turn_left(name , ycoordinate , xcoordinate)   
+        # elif action[0]== 'SPRINT':
+        #     for i in action[1]:
+        #         forward(name , ycoordinate , xcoordinate , action[1])
+        #         action[1]-=1
+             
+        elif len(action)==2 and action[1].isdigit():
+            if action[0] =='FORWARD' or action[0]== 'SPRINT':
+                if action[0]== 'SPRINT' :
+                 
+                    plus=add(int(action[1]))
+                    
+                if key == 0:
+                    if( int(action[1]) + plus)+ ycoordinate>200:
+                        out_of_bounds(name , ycoordinate, xcoordinate)
+                    else:
+
+                        ycoordinate= ycoordinate + (int(action[1]) + plus)
+                        if action[0]!= 'SPRINT' :
+                            forward(name ,ycoordinate , xcoordinate ,action[1])
+                        else:
+                            sprint(name , int(action[1]))
+                            position_forward(name , ycoordinate, xcoordinate)
+                elif key == 1:
+                    if (int(action[1]) + plus) + xcoordinate>100:
+                        out_of_bounds(name , ycoordinate, xcoordinate)
+                    else:
+                        xcoordinate =xcoordinate + (int(action[1]) + plus)
+                        if action[0]!= 'SPRINT' :
+                            forward(name ,ycoordinate , xcoordinate ,action[1])
+                        else:
+                            sprint(name , int(action[1]))
+                            position_forward(name , ycoordinate, xcoordinate)
+                elif key ==2:
+
+                    if  ycoordinate - (int(action[1]) + plus) <-200:
+                        out_of_bounds(name , ycoordinate, xcoordinate)
+                    else:
+                        ycoordinate= ycoordinate - (int(action[1]) + plus)
+                        if action[0]!= 'SPRINT' :
+                            forward(name ,ycoordinate , xcoordinate ,action[1])
+                        else:
+                            sprint(name , int(action[1]))
+                            position_forward(name , ycoordinate, xcoordinate)
+                elif key == 3:
+                  
+                    if  xcoordinate - (int(action[1]) + plus) <-100:
+                        out_of_bounds(name , ycoordinate, xcoordinate)
+                    else:   
+                        
+
+                        xcoordinate = xcoordinate - (int(action[1]) + plus)
+                        if action[0]!= 'SPRINT' :
+                            forward(name ,ycoordinate , xcoordinate ,action[1])
+                        else:
+                            sprint(name , int(action[1]))
+                            position_forward(name , ycoordinate, xcoordinate)
+                
+                
+            elif action[0] =='BACK':
+              
+                if key == 0:
+                    if ycoordinate - int(action[1])  <-200:
+                         out_of_bounds(name , ycoordinate, xcoordinate)
+                    else:
+
+                        ycoordinate= ycoordinate -int(action[1])
+                        back(name , ycoordinate , xcoordinate , action[1])  
+                  
+                elif key == 1:
+                    if  xcoordinate -int(action[1]) <-100:
+                        out_of_bounds(name , ycoordinate, xcoordinate)
+                    else:
+                        xcoordinate =xcoordinate - int(action[1])
+                        back(name , ycoordinate , xcoordinate , action[1]) 
+                        
+                elif key ==2:
+                    if int(action[1]) + ycoordinate>200:
+                        out_of_bounds(name , ycoordinate, xcoordinate)
+                    else:
+                        ycoordinate= ycoordinate + int(action[1])
+                        back(name , ycoordinate , xcoordinate , action[1])
+                elif key == 3:
+                    if int(action[1]) + xcoordinate>100:
+                        out_of_bounds(name , ycoordinate, xcoordinate)
+
+                    else:
+                        xcoordinate = xcoordinate +int(action[1])
+                        back(name , ycoordinate , xcoordinate , action[1])
+
+        
+               
+        else:
+            print(name +': Sorry, I did not understand ' +"'" +action2 +"'.")      
+    
+    else:
+        print(name +': Sorry, I did not understand ' +"'" +action2 +"'.")
+
+    return ycoordinate , xcoordinate , off , key 
+    
+def help():
+    print('''I can understand these commands:
+OFF  - Shut down robot
+HELP - provide information about commands
+FORWARD - move forward
+BACK - move backwards
+RIGHT - move right
+LEFT - move left
+SPRINT - burst of speed''')
+
+def forward(name , ycoordinate , xcoordinate , steps):
+
+    print(' > {} moved forward by {} steps.'.format(name,steps))
+    position_forward(name , ycoordinate, xcoordinate)
+
+def back(name , ycoordinate ,xcoordinate , steps):
+   
+    print(' > {} moved back by {} steps.'.format(name,steps))
+    position_forward(name , ycoordinate , xcoordinate)
+    
+  
+def position_forward(name , ycoordinate , xcoordinate):
+
+    print(" > {} now at position ({},{}).".format(name,xcoordinate,ycoordinate))
+        
+def turn_right(name , ycoordinate , xcoordinate):
+  
+    print(" > {} turned right.".format(name))
+    position_forward(name , ycoordinate , xcoordinate)
+
+def turn_left(name , ycoordinate, xcoordinate):
+
+    print(" > {} turned left.".format(name))
+    position_forward(name , ycoordinate , xcoordinate)
+def out_of_bounds(name , ycoordinate , xcoordinate):
+    print("{}: Sorry, I cannot go outside my safe zone.".format(name))
+    position_forward(name , ycoordinate ,xcoordinate )
+def sprint(name , steps):
+    if steps==0:
+        return 
+    print(" > {} moved forward by {} steps.".format(name,steps))
+    sprint(name ,steps-1)
+def add(steps):
+    plus =0
+    for i in range(steps):
+        plus += i
+    return plus
+if __name__ == "__main__":  
+    robot_start()
+
    
     
-
-
-if __name__ == "__main__":
-    robot_start()
